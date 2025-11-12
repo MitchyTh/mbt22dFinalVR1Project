@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Skeleton_110
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: be3776e9bd6e31341b3490a035f6ea50, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 1523056394552904705, guid: be3776e9bd6e31341b3490a035f6ea50, type: 3}
       propertyPath: m_Name
       value: M_Skeleton.Body
@@ -87,7 +91,7 @@ PrefabInstance:
       addedObject: {fileID: 4635397420428671937}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: be3776e9bd6e31341b3490a035f6ea50, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2426582573772617591}
+      addedObject: {fileID: 4718984106399870120}
   m_SourcePrefab: {fileID: 100100000, guid: be3776e9bd6e31341b3490a035f6ea50, type: 3}
 --- !u!1 &1571042049591659991 stripped
 GameObject:
@@ -106,9 +110,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96380da8bf70f4548a65d5d621ca5567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnZone: {fileID: 0}
   endZone: {fileID: 0}
+  spawnZone: {fileID: 0}
   enemyAnimator: {fileID: 0}
+  moveSpeed: 3
+  health: 100
+  spawner: {fileID: 0}
 --- !u!54 &4635397420428671937
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -136,8 +143,8 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!136 &2426582573772617591
-CapsuleCollider:
+--- !u!65 &4718984106399870120
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -154,11 +161,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.49175066
-  m_Height: 1.775887
-  m_Direction: 1
-  m_Center: {x: -0.026511252, y: 0.89376664, z: 0}
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1.7649556, z: 1}
+  m_Center: {x: 0, y: 0.8800418, z: 0}
 --- !u!4 &4674488975978317807 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6472518530401777513, guid: be3776e9bd6e31341b3490a035f6ea50, type: 3}

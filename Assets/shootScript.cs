@@ -6,6 +6,7 @@ public class shootScript : MonoBehaviour
 {
     public Transform ShootPoint;
     public float range = 100f;
+    public int gunDamage = 50;
     public ParticleSystem muzzleFlash;
     public AudioSource gunShotSound;
 
@@ -33,9 +34,11 @@ public class shootScript : MonoBehaviour
         {
             Debug.Log("Hit: " + hit.collider.name);
 
-            // Optional: apply damage or effects
-            // var target = hit.transform.GetComponent<Target>();
-            // if (target != null) target.TakeDamage(10);
+            if (hit.transform.CompareTag("Enemy"))
+            {
+                enemyMoveScript enemy = hit.transform.GetComponent<enemyMoveScript>();
+                enemy.takeDamage(gunDamage);
+            }
         }
     }
 }

@@ -10,6 +10,10 @@ public class enemyMoveScript : MonoBehaviour
     private Rigidbody rb;
     public float moveSpeed = 3f;
 
+    public int health = 100;
+
+    public spawnScript spawner;
+
     void Start()
     {
         // Get Rigidbody if it exists
@@ -68,5 +72,16 @@ public class enemyMoveScript : MonoBehaviour
         if (rb != null) rb.isKinematic = true;
         Collider col = GetComponent<Collider>();
         if (col != null) col.enabled = false;
+    }
+
+    public void takeDamage(int damage)
+    {
+        health = health - damage;
+        enemyAnimator.SetTrigger("TakeDamage");
+        if (health < 0)
+        {
+            Die();
+            spawner.enemyKilled();
+        }
     }
 }
