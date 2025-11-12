@@ -2,17 +2,71 @@ using UnityEngine;
 
 public class enemyMoveScript : MonoBehaviour
 {
-    public GameObject spawnZone;
     public Transform endZone;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public GameObject spawnZone;
+    public Animator enemyAnimator;
+
+    private bool isDead = false;
+    private Rigidbody rb;
+    public float moveSpeed = 3f;
+
     void Start()
     {
-        
+        // Get Rigidbody if it exists
+        rb = GetComponent<Rigidbody>();
+
+        // Get Animator (search children in case model is nested)
+        if (enemyAnimator == null)
+            enemyAnimator = GetComponentInChildren<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (isDead || endZone == null)
+            return;
+
+        MoveTowardsEndZone();
+
+        // Update animation speed
+        float currentSpeed = rb != null ? rb.linearVelocity.magnitude : moveSpeed;
+        enemyAnimator.SetFloat("Speed", currentSpeed);
+    }
+
+    private void MoveTowardsEndZone()
+    {
+        // Calculate direction to target
+        Vector3 direction = (endZone.position - transform.position).normalized;
+
+        // Move using Transform if no Rigidbody
+        if (rb == null)
+        {
+            transform.position += direction * moveSpeed * Time.deltaTime;
+        }
+        else
+        {
+            // Move with Rigidbody for physics
+            rb.MovePosition(transform.position + direction * moveSpeed * Time.deltaTime);
+        }
+
+        // Rotate to face the target
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, 5f * Time.deltaTime);
+        }
+    }
+
+    public void Die()
+    {
+        if (isDead) return;
+        isDead = true;
+
+        if (enemyAnimator != null)
+            enemyAnimator.SetBool("IsDead", true);
+
+        // Optional: disable physics/colliders
+        if (rb != null) rb.isKinematic = true;
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
     }
 }
