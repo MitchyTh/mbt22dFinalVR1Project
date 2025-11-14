@@ -9,6 +9,10 @@ public class enemyMoveScript : MonoBehaviour
     private bool isDead = false;
     private Rigidbody rb;
     public float moveSpeed = 3f;
+    private bool takingDamage = false;
+    public float stunTime = 0.2f;
+    public float stunTimer = 0f;
+
 
     public int health = 100;
 
@@ -29,7 +33,20 @@ public class enemyMoveScript : MonoBehaviour
         if (isDead || endZone == null)
             return;
 
-        MoveTowardsEndZone();
+        stunTimer -= Time.deltaTime;
+
+        if (stunTimer <= 0)
+        {
+            takingDamage = false;
+        }
+        else
+        {
+            takingDamage= true;
+        }
+        if (!takingDamage)
+        {
+            MoveTowardsEndZone();
+        }
 
         // Update animation speed
         float currentSpeed = rb != null ? rb.linearVelocity.magnitude : moveSpeed;
@@ -78,6 +95,9 @@ public class enemyMoveScript : MonoBehaviour
     {
         health = health - damage;
         enemyAnimator.SetTrigger("TakeDamage");
+
+        stunTimer = stunTime;
+
         if (health < 0)
         {
             Die();

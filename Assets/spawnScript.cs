@@ -19,7 +19,6 @@ public class SpawnScript : MonoBehaviour
     private bool inARound = false;
 
     private float startGameTime = 20f;       // Time before the game starts (countdown)
-    private float roundTime = 30f;           // Time limit for each round
     private float betweenRoundTime = 10f;    // Time to wait between rounds
     private bool gameStarted = false;        // Whether the game has started or not
 
@@ -55,9 +54,10 @@ public class SpawnScript : MonoBehaviour
 
             // Check for round completion (all enemies spawned and killed)
             if (enemiesSpawned == enemiesPerRound && enemiesKilled == enemiesSpawned)
-            {
-                StartCoroutine(BetweenRounds());
-            }
+                if (!isSpawning && !inARound) // Avoid triggering multiple rounds
+                {
+                    StartCoroutine(BetweenRounds());
+                }
         }
 
         // Update round display
@@ -69,20 +69,18 @@ public class SpawnScript : MonoBehaviour
     {
         gameStarted = true;
         roundNum = 1;          // Set the round number
-        roundTime = 30f;       // Set round time (can be adjusted as needed)
+
         StartCoroutine(SpawnRoutine());
     }
 
     // Coroutine to handle the spawning of enemies
     private IEnumerator SpawnRoutine()
     {
+        enemiesSpawned = 0;     // Reset the enemies spawned count for this round
+        enemiesPerRound = (roundNum * 3) + 3;
+        enemiesKilled = 0;      // Reset the enemies killed count
         inARound = true;
         isSpawning = true;
-        enemiesSpawned = 0;     // Reset the enemies spawned count for this round
-        enemiesKilled = 0;      // Reset the enemies killed count
-
-        // Dynamically determine enemies per round (increases with each round)
-        enemiesPerRound = (roundNum * 3) + 3;
 
         // Spawn enemies at the defined interval
         while (enemiesSpawned < enemiesPerRound)
@@ -110,7 +108,6 @@ public class SpawnScript : MonoBehaviour
         }
 
         roundNum++;          // Increase the round number
-        roundTime = 30f;     // Reset round time for the next round
         StartCoroutine(SpawnRoutine()); // Start the next round's enemy spawn routine
     }
 
