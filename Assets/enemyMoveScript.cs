@@ -12,7 +12,7 @@ public class enemyMoveScript : MonoBehaviour
 
     public int health = 100;
 
-    public spawnScript spawner;
+    public SpawnScript spawner;
 
     void Start()
     {
@@ -64,7 +64,6 @@ public class enemyMoveScript : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
-
         if (enemyAnimator != null)
             enemyAnimator.SetBool("IsDead", true);
 
@@ -72,6 +71,7 @@ public class enemyMoveScript : MonoBehaviour
         if (rb != null) rb.isKinematic = true;
         Collider col = GetComponent<Collider>();
         if (col != null) col.enabled = false;
+        gameObject.SetActive(false);
     }
 
     public void takeDamage(int damage)
@@ -81,7 +81,7 @@ public class enemyMoveScript : MonoBehaviour
         if (health < 0)
         {
             Die();
-            spawner.enemyKilled();
+            spawner.EnemyKilled();
         }
     }
 }

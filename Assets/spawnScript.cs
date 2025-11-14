@@ -1,62 +1,102 @@
 using UnityEngine;
 using System.Collections;
-using System.Threading;
+using TMPro;
 
-public class spawnScript : MonoBehaviour
+public class SpawnScript : MonoBehaviour
 {
-    public GameObject enemyPrefab;
-    public GameObject spawnZone;
-    public Transform endZone;
-    public float spawnInterval = 3f;
-    public int enemiesPerRound = 5;
+    public GameObject enemyPrefab;           // Enemy prefab to spawn
+    public GameObject spawnZone;             // General spawn zone reference (if needed elsewhere)
+    public Transform endZone;                // Target zone for enemies to move towards
+    public float spawnInterval = 3f;         // Time interval between enemy spawns
+    public int enemiesPerRound = 5;          // Initial enemies per round
 
-    private int roundNum = 0;
-    private int enemiesSpawned = 0;
-    private int enemiesKilled = 0;
+    private int roundNum = 0;                // Current round number
+    private int enemiesSpawned = 0;          // Number of enemies spawned in the current round
+    private int enemiesKilled = 0;           // Number of enemies killed in the current round
 
-    private Collider[] spawnZones;
-    private bool isSpawning = false;
+    private Collider[] spawnZones;           // Array to hold all spawn zone colliders
+    private bool isSpawning = false;         // Whether spawning is in progress or not
+    private bool inARound = false;
 
-    private float startGameTime = 20f;
-    private float betweenRoundTime = 10f;
-    private bool gameStarted = false;
+    private float startGameTime = 20f;       // Time before the game starts (countdown)
+    private float roundTime = 30f;           // Time limit for each round
+    private float betweenRoundTime = 10f;    // Time to wait between rounds
+    private bool gameStarted = false;        // Whether the game has started or not
+
+    public TextMeshProUGUI roundText;        // UI TextMeshProUGUI for round number
+    public TextMeshProUGUI roundTimeText;    // UI TextMeshProUGUI for round time
+
     void Start()
     {
         // Automatically find all trigger or box colliders in children
         spawnZones = GetComponentsInChildren<Collider>();
     }
-    private void Update()
+
+    void Update()
     {
-        startGameTime -= Time.deltaTime;
-
-        if (startGameTime < 0 && !gameStarted)
+        // Countdown before the game starts
+        if (!gameStarted)
         {
-            StartCoroutine(SpawnRoutine());
-            gameStarted = true;
-            roundNum++;
+            startGameTime -= Time.deltaTime;
+            roundTimeText.text = Mathf.Ceil(startGameTime).ToString("0");
+
+            // Start game when the countdown ends
+            if (startGameTime <= 0)
+            {
+                StartGame();
+            }
+        }
+        else
+        {
+            if (inARound)
+            {
+                roundTimeText.text = "0";
+            }
+
+            // Check for round completion (all enemies spawned and killed)
+            if (enemiesSpawned == enemiesPerRound && enemiesKilled == enemiesSpawned)
+            {
+                StartCoroutine(BetweenRounds());
+            }
         }
 
-        if(enemiesKilled == enemiesSpawned && enemiesPerRound == enemiesSpawned)
-        {
-            StartCoroutine(BetweenRounds());
-        }
+        // Update round display
+        roundText.text = "Round: " + roundNum;
     }
+
+    // Starts the game, initializing round and spawning
+    private void StartGame()
+    {
+        gameStarted = true;
+        roundNum = 1;          // Set the round number
+        roundTime = 30f;       // Set round time (can be adjusted as needed)
+        StartCoroutine(SpawnRoutine());
+    }
+
+    // Coroutine to handle the spawning of enemies
     private IEnumerator SpawnRoutine()
     {
+        inARound = true;
         isSpawning = true;
-        enemiesPerRound = (roundNum * 3) + 3; //Sets number of enemies per round
-        enemiesSpawned = 0;
-        enemiesKilled = 0;
+        enemiesSpawned = 0;     // Reset the enemies spawned count for this round
+        enemiesKilled = 0;      // Reset the enemies killed count
 
-        for (enemiesSpawned = 0; enemiesSpawned < enemiesPerRound; enemiesSpawned++)
+        // Dynamically determine enemies per round (increases with each round)
+        enemiesPerRound = (roundNum * 3) + 3;
+
+        // Spawn enemies at the defined interval
+        while (enemiesSpawned < enemiesPerRound)
         {
             SpawnEnemyAtRandomZone();
+            enemiesSpawned++;
             yield return new WaitForSeconds(spawnInterval);
         }
 
         isSpawning = false;
+        inARound = false;
     }
 
+    // Coroutine to handle the transition between rounds
     private IEnumerator BetweenRounds()
     {
         float timer = betweenRoundTime;
@@ -65,33 +105,41 @@ public class spawnScript : MonoBehaviour
         while (timer > 0f)
         {
             timer -= Time.deltaTime;
+            roundTimeText.text = Mathf.Ceil(timer).ToString("0");
             yield return null; // wait one frame
         }
-        roundNum++;
-        StartCoroutine(SpawnRoutine());
+
+        roundNum++;          // Increase the round number
+        roundTime = 30f;     // Reset round time for the next round
+        StartCoroutine(SpawnRoutine()); // Start the next round's enemy spawn routine
     }
 
-
+    // Spawns an enemy at a random point inside one of the spawn zones
     private void SpawnEnemyAtRandomZone()
     {
         if (spawnZones.Length == 0 || enemyPrefab == null)
             return;
 
-        // Pick a random zone
+        // Pick a random spawn zone
         Collider zone = spawnZones[Random.Range(0, spawnZones.Length)];
 
-        // Pick a random point inside it
+        // Get a random point inside this zone
         Vector3 randomPoint = GetRandomPointInsideCollider(zone);
 
-        // Spawn enemy
+        // Instantiate the new enemy at the random point
         GameObject newEnemy = Instantiate(enemyPrefab, randomPoint, Quaternion.identity);
-        var moveScript = newEnemy.GetComponent<enemyMoveScript>();
 
-        moveScript.spawnZone = spawnZone;
-        moveScript.endZone = endZone;
-        moveScript.spawner = this;
+        // Get the enemy's movement script and set properties
+        var moveScript = newEnemy.GetComponent<enemyMoveScript>();
+        if (moveScript != null)
+        {
+            moveScript.spawnZone = spawnZone;
+            moveScript.endZone = endZone;
+            moveScript.spawner = this; // Pass this spawner to the enemy
+        }
     }
 
+    // Helper function to generate a random point inside a collider (box collider assumed here)
     private Vector3 GetRandomPointInsideCollider(Collider col)
     {
         if (col is BoxCollider box)
@@ -100,9 +148,10 @@ public class spawnScript : MonoBehaviour
             Vector3 localSize = box.size;
             Vector3 worldCenter = box.transform.TransformPoint(localCenter);
 
-            // get half-extents in world space
+            // Get half-extents in world space
             Vector3 halfSize = Vector3.Scale(localSize * 0.5f, box.transform.lossyScale);
 
+            // Random point within the box
             Vector3 randomOffset = new Vector3(
                 Random.Range(-halfSize.x, halfSize.x),
                 Random.Range(-halfSize.y, halfSize.y),
@@ -113,24 +162,26 @@ public class spawnScript : MonoBehaviour
         }
         else
         {
-            // fallback for non-box colliders
+            // Fallback for non-box colliders (e.g., sphere or capsule)
             return col.bounds.center;
         }
     }
 
+    // Optional: Draw spawn zones in the editor to visualize them
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = new Color(0f, 1f, 0f, 0.25f);
+        Gizmos.color = new Color(0f, 1f, 0f, 0.25f); // Light green color
 
         foreach (var col in GetComponentsInChildren<BoxCollider>())
         {
             Matrix4x4 matrix = Matrix4x4.TRS(col.transform.position, col.transform.rotation, col.transform.lossyScale);
             Gizmos.matrix = matrix;
-            Gizmos.DrawCube(col.center, col.size);
+            Gizmos.DrawCube(col.center, col.size); // Draw a box around the spawn zone
         }
     }
 
-    public void enemyKilled()
+    // Method to be called when an enemy is killed
+    public void EnemyKilled()
     {
         enemiesKilled++;
     }
