@@ -10,7 +10,7 @@ public class enemyMoveScript : MonoBehaviour
     private Rigidbody rb;
     public float moveSpeed = 3f;
     private bool takingDamage = false;
-    public float stunTime = 0.2f;
+    public float stunTime = 0.5f;
     public float stunTimer = 0f;
 
 
@@ -35,14 +35,8 @@ public class enemyMoveScript : MonoBehaviour
 
         stunTimer -= Time.deltaTime;
 
-        if (stunTimer <= 0)
-        {
-            takingDamage = false;
-        }
-        else
-        {
-            takingDamage= true;
-        }
+        takingDamage = stunTimer > 0;
+
         if (!takingDamage)
         {
             MoveTowardsEndZone();

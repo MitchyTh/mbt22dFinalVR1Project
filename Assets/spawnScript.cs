@@ -25,6 +25,8 @@ public class SpawnScript : MonoBehaviour
     public TextMeshProUGUI roundText;        // UI TextMeshProUGUI for round number
     public TextMeshProUGUI roundTimeText;    // UI TextMeshProUGUI for round time
 
+    private bool betweenRoundsStarted;
+
     void Start()
     {
         // Automatically find all trigger or box colliders in children
@@ -54,10 +56,14 @@ public class SpawnScript : MonoBehaviour
 
             // Check for round completion (all enemies spawned and killed)
             if (enemiesSpawned == enemiesPerRound && enemiesKilled == enemiesSpawned)
-                if (!isSpawning && !inARound) // Avoid triggering multiple rounds
+            {
+                if (!betweenRoundsStarted)
                 {
                     StartCoroutine(BetweenRounds());
+                    betweenRoundsStarted = true;
                 }
+            }
+               
         }
 
         // Update round display
