@@ -11,8 +11,8 @@ public class SpawnScript : MonoBehaviour
     public int enemiesPerRound = 5;          // Initial enemies per round
 
     private int roundNum = 0;                // Current round number
-    private int enemiesSpawned = 0;          // Number of enemies spawned in the current round
-    private int enemiesKilled = 0;           // Number of enemies killed in the current round
+    public int enemiesSpawned = 0;          // Number of enemies spawned in the current round
+    public int enemiesKilled = 0;           // Number of enemies killed in the current round
 
     private Collider[] spawnZones;           // Array to hold all spawn zone colliders
     private bool isSpawning = false;         // Whether spawning is in progress or not
@@ -26,6 +26,10 @@ public class SpawnScript : MonoBehaviour
     public TextMeshProUGUI roundTimeText;    // UI TextMeshProUGUI for round time
 
     private bool betweenRoundsStarted;
+    private bool firstRoundStarted;
+
+    public PointManagerScript points;
+    public int highestRound = 0;
 
     void Start()
     {
@@ -36,22 +40,28 @@ public class SpawnScript : MonoBehaviour
     void Update()
     {
         // Countdown before the game starts
-        if (!gameStarted)
+        if (gameStarted && !firstRoundStarted)
         {
             startGameTime -= Time.deltaTime;
-            roundTimeText.text = Mathf.Ceil(startGameTime).ToString("0");
+            roundTimeText.text = "Round Starts In: " + Mathf.Ceil(startGameTime).ToString("0");
 
             // Start game when the countdown ends
-            if (startGameTime <= 0)
+            if (startGameTime <= 0 && !firstRoundStarted)
             {
-                StartGame();
+                StartCoroutine(SpawnRoutine());
+                firstRoundStarted = true;
+            }
+
+            if (roundNum > highestRound)
+            {
+                highestRound = roundNum;
             }
         }
         else
         {
             if (inARound)
             {
-                roundTimeText.text = "0";
+                roundTimeText.text = "Round Has Started";
             }
 
             // Check for round completion (all enemies spawned and killed)
@@ -71,12 +81,39 @@ public class SpawnScript : MonoBehaviour
     }
 
     // Starts the game, initializing round and spawning
-    private void StartGame()
+    public void StartGame()
     {
-        gameStarted = true;
-        roundNum = 1;          // Set the round number
+        if (!gameStarted)
+        {
+            gameStarted = true;
+            roundNum = 1; 
+        }
+    }
 
-        StartCoroutine(SpawnRoutine());
+    public void endGame()
+    {
+        gameStarted = false;
+        roundNum = 0;
+        enemiesKilled = 0;
+        enemiesSpawned = 0;
+        enemiesPerRound = 5;
+        inARound = false;
+        firstRoundStarted = false;
+        betweenRoundsStarted = false;
+        points.removePoints(points.points);
+        startGameTime = 20;
+
+        GameObject[] objects = GameObject.FindGameObjectsWithTag("Enemy");
+
+        // Loop through and destroy them
+        foreach (GameObject obj in objects)
+        {
+            Destroy(obj);
+        }
+
+        roundText.text = roundText.text = "Round: " + roundNum;
+        roundTimeText.text = "Game Hasn't Started";
+
     }
 
     // Coroutine to handle the spawning of enemies
@@ -109,11 +146,12 @@ public class SpawnScript : MonoBehaviour
         while (timer > 0f)
         {
             timer -= Time.deltaTime;
-            roundTimeText.text = Mathf.Ceil(timer).ToString("0");
+            roundTimeText.text = "Round Starts In: " + Mathf.Ceil(timer).ToString("0");
             yield return null; // wait one frame
         }
 
         roundNum++;          // Increase the round number
+        betweenRoundsStarted = false;
         StartCoroutine(SpawnRoutine()); // Start the next round's enemy spawn routine
     }
 
@@ -187,5 +225,6 @@ public class SpawnScript : MonoBehaviour
     public void EnemyKilled()
     {
         enemiesKilled++;
+        points.addPoints(100);
     }
 }

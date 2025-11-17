@@ -9,8 +9,8 @@ public class enemyMoveScript : MonoBehaviour
     private bool isDead = false;
     private Rigidbody rb;
     public float moveSpeed = 3f;
-    private bool takingDamage = false;
-    public float stunTime = 0.5f;
+    public bool takingDamage = false;
+    private float stunTime = 1f;
     public float stunTimer = 0f;
 
 

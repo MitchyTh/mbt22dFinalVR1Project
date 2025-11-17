@@ -7,6 +7,8 @@ public class shootScript : MonoBehaviour
     public Transform ShootPoint;
     public float range = 100f;
     public int gunDamage = 50;
+    public float reloadTime = 0.5f;
+    private float reloadTimer = 0;
     public ParticleSystem muzzleFlash;
     public AudioSource gunShotSound;
 
@@ -19,9 +21,17 @@ public class shootScript : MonoBehaviour
         grabInteractable.activated.AddListener(OnTriggerPulled);
     }
 
+    private void Update()
+    {
+        reloadTimer = -Time.deltaTime;
+    }
+
     private void OnTriggerPulled(ActivateEventArgs args)
     {
-        Shoot();
+        if (reloadTimer <= 0)
+        {
+            Shoot();
+        }
     }
 
     void Shoot()
@@ -40,5 +50,7 @@ public class shootScript : MonoBehaviour
                 enemy.takeDamage(gunDamage);
             }
         }
+
+        reloadTimer = reloadTime;
     }
 }
