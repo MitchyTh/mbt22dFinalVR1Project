@@ -24,6 +24,7 @@ public class SpawnScript : MonoBehaviour
 
     public TextMeshProUGUI roundText;        // UI TextMeshProUGUI for round number
     public TextMeshProUGUI roundTimeText;    // UI TextMeshProUGUI for round time
+    public TextMeshProUGUI highScoreText;    // For high score
 
     private bool betweenRoundsStarted;
     private bool firstRoundStarted;
@@ -35,6 +36,7 @@ public class SpawnScript : MonoBehaviour
     {
         // Automatically find all trigger or box colliders in children
         spawnZones = GetComponentsInChildren<Collider>();
+        highScoreText.text = "High Score: Round 0";
     }
 
     void Update()
@@ -52,10 +54,6 @@ public class SpawnScript : MonoBehaviour
                 firstRoundStarted = true;
             }
 
-            if (roundNum > highestRound)
-            {
-                highestRound = roundNum;
-            }
         }
         else
         {
@@ -74,6 +72,12 @@ public class SpawnScript : MonoBehaviour
                 }
             }
                
+        }
+
+        if (roundNum > highestRound)
+        {
+            highestRound = roundNum;
+            highScoreText.text = "Highest Round: Round " + highestRound.ToString();
         }
 
         // Update round display
@@ -151,6 +155,7 @@ public class SpawnScript : MonoBehaviour
         }
 
         roundNum++;          // Increase the round number
+
         betweenRoundsStarted = false;
         StartCoroutine(SpawnRoutine()); // Start the next round's enemy spawn routine
     }

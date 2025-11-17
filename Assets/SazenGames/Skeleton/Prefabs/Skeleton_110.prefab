@@ -113,7 +113,9 @@ MonoBehaviour:
   endZone: {fileID: 0}
   spawnZone: {fileID: 0}
   enemyAnimator: {fileID: 0}
-  moveSpeed: 3
+  moveSpeed: 1.5
+  takingDamage: 0
+  stunTimer: 0
   health: 100
   spawner: {fileID: 0}
 --- !u!54 &4635397420428671937

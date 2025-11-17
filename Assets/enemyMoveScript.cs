@@ -40,11 +40,14 @@ public class enemyMoveScript : MonoBehaviour
         if (!takingDamage)
         {
             MoveTowardsEndZone();
+            // Resume walking animation
+            enemyAnimator.SetFloat("Speed", moveSpeed);
         }
-
-        // Update animation speed
-        float currentSpeed = rb != null ? rb.linearVelocity.magnitude : moveSpeed;
-        enemyAnimator.SetFloat("Speed", currentSpeed);
+        else
+        {
+            // Stop movement animation while taking damage
+            enemyAnimator.SetFloat("Speed", 0f);
+        }
     }
 
     private void MoveTowardsEndZone()
