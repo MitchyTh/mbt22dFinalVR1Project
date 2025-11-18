@@ -41,12 +41,12 @@ public class enemyMoveScript : MonoBehaviour
         {
             MoveTowardsEndZone();
             // Resume walking animation
-            enemyAnimator.SetFloat("Speed", moveSpeed);
+            enemyAnimator.SetFloat("MoveSpeed", moveSpeed);
         }
         else
         {
             // Stop movement animation while taking damage
-            enemyAnimator.SetFloat("Speed", 0f);
+            enemyAnimator.SetFloat("MoveSpeed", 0f);
         }
     }
 

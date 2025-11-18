@@ -30,6 +30,7 @@ public class SpawnScript : MonoBehaviour
     private bool firstRoundStarted;
 
     public PointManagerScript points;
+    public int lastRound;
     public int highestRound = 0;
 
     void Start()
@@ -97,6 +98,7 @@ public class SpawnScript : MonoBehaviour
     public void endGame()
     {
         gameStarted = false;
+        lastRound = roundNum;
         roundNum = 0;
         enemiesKilled = 0;
         enemiesSpawned = 0;
@@ -116,7 +118,7 @@ public class SpawnScript : MonoBehaviour
         }
 
         roundText.text = roundText.text = "Round: " + roundNum;
-        roundTimeText.text = "Game Hasn't Started";
+        roundTimeText.text = "Game Over: You made it to round " + lastRound.ToString();
 
     }
 
