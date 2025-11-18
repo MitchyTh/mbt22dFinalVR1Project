@@ -8,12 +8,13 @@ public class enemyMoveScript : MonoBehaviour
 
     private bool isDead = false;
     private Rigidbody rb;
-    public float moveSpeed = 3f;
+    public float maxMoveSpeed = 3f;
+    public float moveSpeed = 2f;
     public bool takingDamage = false;
     private float stunTime = 1f;
     public float stunTimer = 0f;
 
-
+    public int maxHealth = 100;
     public int health = 100;
 
     public SpawnScript spawner;
@@ -26,6 +27,9 @@ public class enemyMoveScript : MonoBehaviour
         // Get Animator (search children in case model is nested)
         if (enemyAnimator == null)
             enemyAnimator = GetComponentInChildren<Animator>();
+
+        health = spawner.maxEnemyHealth;
+        moveSpeed = spawner.maxEnemyMovementSpeed;
     }
 
     void Update()

@@ -11,6 +11,7 @@ public class shootScript : MonoBehaviour
     private float reloadTimer = 0;
     public ParticleSystem muzzleFlash;
     public AudioSource gunShotSound;
+    public PointManagerScript points;
 
     private XRGrabInteractable grabInteractable;
 
@@ -52,5 +53,23 @@ public class shootScript : MonoBehaviour
         }
 
         reloadTimer = reloadTime;
+    }
+
+    public void upgradeReloadTime()
+    {
+        if (points.points >= points.reloadSpeedUpgreadeCost)
+        {
+            reloadTime -= 0.2f;
+            points.reloadSpeedUpgreadeCost += 800;
+        }
+    }
+
+    public void upgradeDamage()
+    {
+        if (points.points >= points.damageUpgradeCost)
+        {
+            gunDamage += 20;
+            points.damageUpgradeCost += 1000;
+        }
     }
 }

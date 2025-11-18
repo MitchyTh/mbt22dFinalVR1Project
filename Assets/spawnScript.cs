@@ -32,6 +32,8 @@ public class SpawnScript : MonoBehaviour
     public PointManagerScript points;
     public int lastRound;
     public int highestRound = 0;
+    public int maxEnemyHealth = 100;
+    public float maxEnemyMovementSpeed = 2f;
 
     void Start()
     {
@@ -158,6 +160,15 @@ public class SpawnScript : MonoBehaviour
 
         roundNum++;          // Increase the round number
 
+        if (roundNum % 3 == 0)
+        {
+            increaseEnemySpawnSpeed();
+        }
+
+        if (roundNum % 5 == 0)
+        {
+            buffEnemy();
+        }
         betweenRoundsStarted = false;
         StartCoroutine(SpawnRoutine()); // Start the next round's enemy spawn routine
     }
@@ -234,4 +245,35 @@ public class SpawnScript : MonoBehaviour
         enemiesKilled++;
         points.addPoints(100);
     }
+
+    public void increaseEnemySpawnSpeed()
+    {
+        if (spawnInterval > 0.5f)
+        {
+            spawnInterval -= 0.5f;
+        }
+    }
+
+    public void buffEnemy()
+    {
+        increaseEnemyMovementHealth();
+        increaseEnemyMovementSpeed();
+    }
+
+    public void increaseEnemyMovementSpeed()
+    {
+        if (maxEnemyMovementSpeed < 5f)
+        {
+            maxEnemyMovementSpeed += 0.3f;
+        }
+    }
+
+    public void increaseEnemyMovementHealth()
+    {
+        if (maxEnemyHealth > 300)
+        {
+            maxEnemyHealth += 50;
+        }
+    }
+
 }
