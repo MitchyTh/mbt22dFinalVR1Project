@@ -59,6 +59,7 @@ public class shootScript : MonoBehaviour
     {
         if (points.points >= points.reloadSpeedUpgreadeCost)
         {
+            points.removePoints(points.reloadSpeedUpgreadeCost);
             reloadTime -= 0.2f;
             points.reloadSpeedUpgreadeCost += 800;
         }
@@ -68,6 +69,7 @@ public class shootScript : MonoBehaviour
     {
         if (points.points >= points.damageUpgradeCost)
         {
+            points.removePoints(points.damageUpgradeCost);
             gunDamage += 20;
             points.damageUpgradeCost += 1000;
         }

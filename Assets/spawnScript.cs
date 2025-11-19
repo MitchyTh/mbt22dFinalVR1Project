@@ -4,27 +4,27 @@ using TMPro;
 
 public class SpawnScript : MonoBehaviour
 {
-    public GameObject enemyPrefab;           // Enemy prefab to spawn
-    public GameObject spawnZone;             // General spawn zone reference (if needed elsewhere)
-    public Transform endZone;                // Target zone for enemies to move towards
-    public float spawnInterval = 3f;         // Time interval between enemy spawns
-    public int enemiesPerRound = 5;          // Initial enemies per round
+    public GameObject enemyPrefab;
+    public GameObject spawnZone;
+    public Transform endZone;
+    public float spawnInterval = 3f;
+    public int enemiesPerRound = 5;
 
-    private int roundNum = 0;                // Current round number
-    public int enemiesSpawned = 0;          // Number of enemies spawned in the current round
-    public int enemiesKilled = 0;           // Number of enemies killed in the current round
+    private int roundNum = 0;
+    public int enemiesSpawned = 0;
+    public int enemiesKilled = 0;
 
-    private Collider[] spawnZones;           // Array to hold all spawn zone colliders
-    private bool isSpawning = false;         // Whether spawning is in progress or not
+    private Collider[] spawnZones;
+    private bool isSpawning = false;
     private bool inARound = false;
 
-    private float startGameTime = 20f;       // Time before the game starts (countdown)
-    private float betweenRoundTime = 10f;    // Time to wait between rounds
-    private bool gameStarted = false;        // Whether the game has started or not
+    private float startGameTime = 20f;
+    private float betweenRoundTime = 20f;
+    private bool gameStarted = false;
 
-    public TextMeshProUGUI roundText;        // UI TextMeshProUGUI for round number
-    public TextMeshProUGUI roundTimeText;    // UI TextMeshProUGUI for round time
-    public TextMeshProUGUI highScoreText;    // For high score
+    public TextMeshProUGUI roundText;
+    public TextMeshProUGUI roundTimeText;
+    public TextMeshProUGUI highScoreText;
 
     private bool betweenRoundsStarted;
     private bool firstRoundStarted;
@@ -37,66 +37,63 @@ public class SpawnScript : MonoBehaviour
 
     void Start()
     {
-        // Automatically find all trigger or box colliders in children
         spawnZones = GetComponentsInChildren<Collider>();
         highScoreText.text = "High Score: Round 0";
     }
 
     void Update()
     {
-        // Countdown before the game starts
+        // Countdown before first round
         if (gameStarted && !firstRoundStarted)
         {
             startGameTime -= Time.deltaTime;
             roundTimeText.text = "Round Starts In: " + Mathf.Ceil(startGameTime).ToString("0");
 
-            // Start game when the countdown ends
-            if (startGameTime <= 0 && !firstRoundStarted)
+            if (startGameTime <= 0f && !firstRoundStarted)
             {
-                StartCoroutine(SpawnRoutine());
                 firstRoundStarted = true;
+                roundNum = 1;
+                StartCoroutine(SpawnRoutine());
             }
-
         }
         else
         {
             if (inARound)
-            {
                 roundTimeText.text = "Round Has Started";
-            }
 
-            // Check for round completion (all enemies spawned and killed)
-            if (enemiesSpawned == enemiesPerRound && enemiesKilled == enemiesSpawned)
+            // Check for round completion
+            if (inARound && enemiesSpawned == enemiesPerRound && enemiesKilled == enemiesSpawned)
             {
                 if (!betweenRoundsStarted)
                 {
-                    StartCoroutine(BetweenRounds());
                     betweenRoundsStarted = true;
+                    inARound = false;
+                    StartCoroutine(BetweenRounds());
                 }
             }
-               
         }
 
+        // Update highest round
         if (roundNum > highestRound)
         {
             highestRound = roundNum;
             highScoreText.text = "Highest Round: Round " + highestRound.ToString();
         }
 
-        // Update round display
         roundText.text = "Round: " + roundNum;
     }
 
-    // Starts the game, initializing round and spawning
+    // Start the game
     public void StartGame()
     {
         if (!gameStarted)
         {
             gameStarted = true;
-            roundNum = 1; 
+            startGameTime = 5f; // optional quick countdown
         }
     }
 
+    // End the game
     public void endGame()
     {
         gameStarted = false;
@@ -112,28 +109,28 @@ public class SpawnScript : MonoBehaviour
         startGameTime = 20;
 
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Enemy");
-
-        // Loop through and destroy them
         foreach (GameObject obj in objects)
         {
-            Destroy(obj);
+            enemyMoveScript script = obj.GetComponent<enemyMoveScript>();
+            if (script != null)
+                script.Die();
         }
 
-        roundText.text = roundText.text = "Round: " + roundNum;
+        roundText.text = "Round: " + roundNum;
         roundTimeText.text = "Game Over: You made it to round " + lastRound.ToString();
-
     }
 
-    // Coroutine to handle the spawning of enemies
+    // Coroutine for spawning enemies
     private IEnumerator SpawnRoutine()
     {
-        enemiesSpawned = 0;     // Reset the enemies spawned count for this round
-        enemiesPerRound = (roundNum * 3) + 3;
-        enemiesKilled = 0;      // Reset the enemies killed count
+        enemiesSpawned = 0;
+        enemiesKilled = 0;
         inARound = true;
         isSpawning = true;
 
-        // Spawn enemies at the defined interval
+        // Calculate enemies for this round: Round 1 = 5, Round 2 = 7, Round 3 = 9, etc.
+        enemiesPerRound = 5 + (roundNum - 1) * 2;
+
         while (enemiesSpawned < enemiesPerRound)
         {
             SpawnEnemyAtRandomZone();
@@ -142,63 +139,57 @@ public class SpawnScript : MonoBehaviour
         }
 
         isSpawning = false;
-        inARound = false;
     }
 
-    // Coroutine to handle the transition between rounds
+    // Coroutine for between rounds countdown
     private IEnumerator BetweenRounds()
     {
         float timer = betweenRoundTime;
 
-        // Wait for the countdown before starting next round
         while (timer > 0f)
         {
             timer -= Time.deltaTime;
             roundTimeText.text = "Round Starts In: " + Mathf.Ceil(timer).ToString("0");
-            yield return null; // wait one frame
+            yield return null;
         }
 
-        roundNum++;          // Increase the round number
+        roundNum++;
 
+        // Buff enemies and spawn speed at certain rounds
         if (roundNum % 3 == 0)
-        {
             increaseEnemySpawnSpeed();
-        }
 
         if (roundNum % 5 == 0)
-        {
             buffEnemy();
-        }
+
         betweenRoundsStarted = false;
-        StartCoroutine(SpawnRoutine()); // Start the next round's enemy spawn routine
+        StartCoroutine(SpawnRoutine());
     }
 
-    // Spawns an enemy at a random point inside one of the spawn zones
+    // Spawn a single enemy at a random spawn zone
     private void SpawnEnemyAtRandomZone()
     {
         if (spawnZones.Length == 0 || enemyPrefab == null)
             return;
 
-        // Pick a random spawn zone
         Collider zone = spawnZones[Random.Range(0, spawnZones.Length)];
-
-        // Get a random point inside this zone
         Vector3 randomPoint = GetRandomPointInsideCollider(zone);
 
-        // Instantiate the new enemy at the random point
         GameObject newEnemy = Instantiate(enemyPrefab, randomPoint, Quaternion.identity);
 
-        // Get the enemy's movement script and set properties
         var moveScript = newEnemy.GetComponent<enemyMoveScript>();
         if (moveScript != null)
         {
             moveScript.spawnZone = spawnZone;
             moveScript.endZone = endZone;
-            moveScript.spawner = this; // Pass this spawner to the enemy
+            moveScript.spawner = this;
+            moveScript.maxHealth = maxEnemyHealth;
+            moveScript.health = maxEnemyHealth;
+            moveScript.moveSpeed = maxEnemyMovementSpeed;
         }
     }
 
-    // Helper function to generate a random point inside a collider (box collider assumed here)
+    // Get a random point inside a box collider
     private Vector3 GetRandomPointInsideCollider(Collider col)
     {
         if (col is BoxCollider box)
@@ -206,52 +197,39 @@ public class SpawnScript : MonoBehaviour
             Vector3 localCenter = box.center;
             Vector3 localSize = box.size;
             Vector3 worldCenter = box.transform.TransformPoint(localCenter);
-
-            // Get half-extents in world space
             Vector3 halfSize = Vector3.Scale(localSize * 0.5f, box.transform.lossyScale);
 
-            // Random point within the box
-            Vector3 randomOffset = new Vector3(
+            return worldCenter + new Vector3(
                 Random.Range(-halfSize.x, halfSize.x),
                 Random.Range(-halfSize.y, halfSize.y),
                 Random.Range(-halfSize.z, halfSize.z)
             );
-
-            return worldCenter + randomOffset;
         }
-        else
-        {
-            // Fallback for non-box colliders (e.g., sphere or capsule)
-            return col.bounds.center;
-        }
+        return col.bounds.center;
     }
 
-    // Optional: Draw spawn zones in the editor to visualize them
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = new Color(0f, 1f, 0f, 0.25f); // Light green color
-
+        Gizmos.color = new Color(0f, 1f, 0f, 0.25f);
         foreach (var col in GetComponentsInChildren<BoxCollider>())
         {
             Matrix4x4 matrix = Matrix4x4.TRS(col.transform.position, col.transform.rotation, col.transform.lossyScale);
             Gizmos.matrix = matrix;
-            Gizmos.DrawCube(col.center, col.size); // Draw a box around the spawn zone
+            Gizmos.DrawCube(col.center, col.size);
         }
     }
 
-    // Method to be called when an enemy is killed
+    // Called when an enemy dies
     public void EnemyKilled()
     {
         enemiesKilled++;
-        points.addPoints(100);
+        points.addPoints(100); // only once per kill
     }
 
     public void increaseEnemySpawnSpeed()
     {
-        if (spawnInterval > 0.5f)
-        {
-            spawnInterval -= 0.5f;
-        }
+        if (spawnInterval > 0.7f)
+            spawnInterval -= 0.1f;
     }
 
     public void buffEnemy()
@@ -263,17 +241,12 @@ public class SpawnScript : MonoBehaviour
     public void increaseEnemyMovementSpeed()
     {
         if (maxEnemyMovementSpeed < 5f)
-        {
             maxEnemyMovementSpeed += 0.3f;
-        }
     }
 
     public void increaseEnemyMovementHealth()
     {
-        if (maxEnemyHealth > 300)
-        {
+        if (maxEnemyHealth < 300)
             maxEnemyHealth += 50;
-        }
     }
-
 }
