@@ -96,6 +96,7 @@ public class SpawnScript : MonoBehaviour
     // End the game
     public void endGame()
     {
+        StopAllCoroutines();  
         gameStarted = false;
         lastRound = roundNum;
         roundNum = 0;
@@ -156,11 +157,16 @@ public class SpawnScript : MonoBehaviour
         roundNum++;
 
         // Buff enemies and spawn speed at certain rounds
-        if (roundNum % 3 == 0)
-            increaseEnemySpawnSpeed();
 
-        if (roundNum % 5 == 0)
-            buffEnemy();
+        increaseEnemySpawnSpeed();
+
+        if (roundNum % 2 == 0)
+        {
+            increaseEnemyMovementSpeed();
+        }
+
+        if (roundNum % 3 == 0)
+            increaseEnemyHealth();
 
         betweenRoundsStarted = false;
         StartCoroutine(SpawnRoutine());
@@ -228,14 +234,8 @@ public class SpawnScript : MonoBehaviour
 
     public void increaseEnemySpawnSpeed()
     {
-        if (spawnInterval > 0.7f)
-            spawnInterval -= 0.1f;
-    }
-
-    public void buffEnemy()
-    {
-        increaseEnemyMovementHealth();
-        increaseEnemyMovementSpeed();
+        if (spawnInterval > 0.2f)
+            spawnInterval -= 0.2f;
     }
 
     public void increaseEnemyMovementSpeed()
@@ -244,7 +244,7 @@ public class SpawnScript : MonoBehaviour
             maxEnemyMovementSpeed += 0.3f;
     }
 
-    public void increaseEnemyMovementHealth()
+    public void increaseEnemyHealth()
     {
         if (maxEnemyHealth < 300)
             maxEnemyHealth += 50;

@@ -19,7 +19,7 @@ public class enemyMoveScript : MonoBehaviour
     public float stunTimer = 0f;
     private float distanceToEndzone;
     private float distanceToPlayer;
-    private float chaseDistance = 8f;
+    private float chaseDistance = 12f;
 
     public int maxHealth = 100;
     public int health = 100;
@@ -156,14 +156,15 @@ public class enemyMoveScript : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player"))
         {
             enemyAnimator.SetTrigger("HitPlayer");
             StartCoroutine(EndGameAfterDelay(2f));
         }
     }
+
 
     private IEnumerator EndGameAfterDelay(float delay)
     {
