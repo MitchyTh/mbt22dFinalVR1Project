@@ -35,6 +35,10 @@ public class SpawnScript : MonoBehaviour
     public int maxEnemyHealth = 100;
     public float maxEnemyMovementSpeed = 2f;
 
+    //Sound 
+    public AudioSource calmMusic;
+    public AudioSource fastMusic;
+
     void Start()
     {
         spawnZones = GetComponentsInChildren<Collider>();
@@ -88,8 +92,9 @@ public class SpawnScript : MonoBehaviour
     {
         if (!gameStarted)
         {
+            startFastMusic();
             gameStarted = true;
-            startGameTime = 5f; // optional quick countdown
+            startGameTime = 5f; // quick countdown
         }
     }
 
@@ -108,6 +113,7 @@ public class SpawnScript : MonoBehaviour
         betweenRoundsStarted = false;
         points.removePoints(points.points);
         startGameTime = 20;
+        startCalmMusic();
 
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Enemy");
         foreach (GameObject obj in objects)
@@ -248,5 +254,29 @@ public class SpawnScript : MonoBehaviour
     {
         if (maxEnemyHealth < 300)
             maxEnemyHealth += 50;
+    }
+
+    public void startCalmMusic()
+    {
+        if (fastMusic.isPlaying)
+        {
+            fastMusic.Stop();
+        }
+        if (!calmMusic.isPlaying)
+        {
+            calmMusic.Play();
+        }
+    }
+
+    public void startFastMusic()
+    {
+        if (!fastMusic.isPlaying)
+        {
+            fastMusic.Play();
+        }
+        if (calmMusic.isPlaying)
+        {
+            calmMusic.Stop();
+        }
     }
 }
