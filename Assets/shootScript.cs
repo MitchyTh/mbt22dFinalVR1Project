@@ -7,7 +7,9 @@ public class shootScript : MonoBehaviour
     public Transform ShootPoint;
     public float range = 100f;
     public int gunDamage = 50;
+    private int upgradedGunDamage;
     public float reloadTime = 1.2f;
+    private float upgradedReloadTime;
     private float reloadTimer = 0;
     public ParticleSystem muzzleFlash;
     public AudioSource gunShotSound;
@@ -20,6 +22,8 @@ public class shootScript : MonoBehaviour
     {
         grabInteractable = GetComponent<XRGrabInteractable>();
         grabInteractable.activated.AddListener(OnTriggerPulled);
+        upgradedGunDamage = gunDamage;
+        upgradedReloadTime = reloadTime;
     }
 
     private void Update()
@@ -48,11 +52,11 @@ public class shootScript : MonoBehaviour
             if (hit.transform.CompareTag("Enemy"))
             {
                 enemyMoveScript enemy = hit.transform.GetComponent<enemyMoveScript>();
-                enemy.takeDamage(gunDamage);
+                enemy.takeDamage(upgradedGunDamage);
             }
         }
 
-        reloadTimer = reloadTime;
+        reloadTimer = upgradedReloadTime;
     }
 
     public void upgradeReloadTime()
