@@ -165,7 +165,7 @@ public class SpawnScript : MonoBehaviour
             increaseEnemyMovementSpeed();
         }
 
-        if (roundNum % 3 == 0)
+        if (roundNum % 5 == 0)
             increaseEnemyHealth();
 
         betweenRoundsStarted = false;
@@ -235,7 +235,7 @@ public class SpawnScript : MonoBehaviour
     public void increaseEnemySpawnSpeed()
     {
         if (spawnInterval > 0.2f)
-            spawnInterval -= 0.2f;
+            spawnInterval -= 0.3f;
     }
 
     public void increaseEnemyMovementSpeed()
