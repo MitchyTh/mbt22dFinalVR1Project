@@ -74,7 +74,7 @@ public class shootScript : MonoBehaviour
         if (points.points >= points.damageUpgradeCost)
         {
             points.removePoints(points.damageUpgradeCost);
-            gunDamage += 30;
+            gunDamage += 50;
             points.damageUpgradeCost += 1000;
         }
     }
