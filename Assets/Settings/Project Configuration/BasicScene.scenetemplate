@@ -98,6 +98,8 @@ MonoBehaviour:
     instantiationMode: 0
   - dependency: {fileID: 2577682271339154884, guid: a6b5d41519eefeb46be3660d3a128ead, type: 3}
     instantiationMode: 0
+  - dependency: {fileID: -944628639613478452, guid: 54b0f5015fe08cd438f33ef98e7ff513, type: 3}
+    instantiationMode: 1
   - dependency: {fileID: 919132149155446097, guid: be2911572dc3afa448d24b4e97edc5f1, type: 3}
     instantiationMode: 0
   - dependency: {fileID: 8557626236480139543, guid: 3bec5058743290f4c884ed6e3a440d08, type: 3}
@@ -171,6 +173,8 @@ MonoBehaviour:
   - dependency: {fileID: 11400000, guid: fc690d1505c48cb4696838b71abd2ca0, type: 2}
     instantiationMode: 1
   - dependency: {fileID: 100000, guid: 6c7eaede4efc960409fb9ef2dfb77f29, type: 3}
+    instantiationMode: 0
+  - dependency: {fileID: 9204585357485985067, guid: 846ec19e37bb04c478226f0f54718c78, type: 3}
     instantiationMode: 0
   - dependency: {fileID: 2100000, guid: 21336316c1953c841ac00b019570ff43, type: 2}
     instantiationMode: 0
@@ -302,9 +306,9 @@ MonoBehaviour:
     instantiationMode: 0
   - dependency: {fileID: 38335279662140195, guid: 34d3f526198dae440bb2ce6005d86055, type: 3}
     instantiationMode: 0
-  - dependency: {fileID: 2100000, guid: 6f3d696f7c3365846b6dc2402afb3d3e, type: 2}
-    instantiationMode: 0
   - dependency: {fileID: 919132149155446097, guid: c206cf45441f0484b930f9f870961a03, type: 3}
+    instantiationMode: 0
+  - dependency: {fileID: 2100000, guid: 6f3d696f7c3365846b6dc2402afb3d3e, type: 2}
     instantiationMode: 0
   - dependency: {fileID: 919132149155446097, guid: 28f4158f0ebbb6046984f1158aeca0e9, type: 3}
     instantiationMode: 0
@@ -376,6 +380,8 @@ MonoBehaviour:
     instantiationMode: 0
   - dependency: {fileID: 2100000, guid: 2442ce0cd8f6a534c842e7c4c8b4e935, type: 2}
     instantiationMode: 0
+  - dependency: {fileID: 2800000, guid: 40265a896a0f341bb956e90c59025a29, type: 3}
+    instantiationMode: 1
   - dependency: {fileID: 100000, guid: 2096cda62bf772342bc7a4aeda6e4a67, type: 3}
     instantiationMode: 0
   - dependency: {fileID: 100000, guid: 603970f97e50c56488ec3c5a6febd940, type: 3}
